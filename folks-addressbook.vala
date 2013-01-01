@@ -1,3 +1,5 @@
+#!/usr/bin/vala --pkg gtk+-3.0 --pkg folks
+
 //     Copyright 2013 Peter Oliver.
 //
 //     This file is part of folks-addressbook.
