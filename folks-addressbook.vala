@@ -43,7 +43,7 @@ int main(string[] args) {
 		}
 	);
 
-	aggregator.prepare();
+	aggregator.prepare.begin();
 	Gtk.main();
 	return 0;
 }
