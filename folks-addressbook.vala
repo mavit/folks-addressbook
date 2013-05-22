@@ -28,7 +28,6 @@ int main(string[] args) {
 	
 	aggregator.notify["is-quiescent"].connect(
 		(agg, evt) => {
-			stdout.printf("called back.\n");
 			foreach ( var individual in aggregator.individuals.values ) {
 				var nickname = nickname_for_individual(individual);
 				var sortname = sortname_for_individual(individual);
@@ -54,6 +53,9 @@ string nickname_for_individual(Folks.Individual individual) {
 	if ( individual.nickname != "" ) {
 		return individual.nickname;
 	}
+	else if ( individual.structured_name == null ) {
+		return "";
+	}
 
 	string nickname = ""; 
 	// FIXME: what is the Vala syntax to make this a loop?
@@ -68,10 +70,13 @@ string nickname_for_individual(Folks.Individual individual) {
 }
 
 string sortname_for_individual(Folks.Individual individual) {
-	if ( individual.structured_name.given_name != null 
-		 && individual.structured_name.given_name != ""
-		 && individual.structured_name.family_name != null
-		 && individual.structured_name.family_name != "" ) {
+	if ( individual.structured_name == null ) {
+		return "";
+	}
+	else if ( individual.structured_name.given_name != null 
+			  && individual.structured_name.given_name != ""
+			  && individual.structured_name.family_name != null
+			  && individual.structured_name.family_name != "" ) {
 		return "%s, %s".printf(individual.structured_name.family_name,
 							   individual.structured_name.given_name);
 	}
