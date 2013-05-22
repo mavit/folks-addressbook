@@ -20,16 +20,29 @@
 
 using Gtk;
 using Folks;
+using Gee;
 
 int main(string[] args) {
 	Gtk.init(ref args);
 	
 	var aggregator = new Folks.IndividualAggregator();
+	var nicknames = new HashSet<string> ();
 	
 	aggregator.notify["is-quiescent"].connect(
 		(agg, evt) => {
 			foreach ( var individual in aggregator.individuals.values ) {
 				var nickname = nickname_for_individual(individual);
+
+				// FIXME: how to make this stable?
+				if ( nickname != "" && nicknames.contains(nickname) ) {
+					int i = 2;
+					while ( nicknames.contains("%s%d".printf(nickname, i)) ) {
+						++i;
+					}
+					nickname = "%s%d".printf(nickname, i);
+				}
+				nicknames.add(nickname);
+
 				var sortname = sortname_for_individual(individual);
 				var address = primary_address_for_individual(individual);
 				if ( address == "" ) { continue; }
@@ -47,7 +60,6 @@ int main(string[] args) {
 	return 0;
 }
 
-// FIXME: need to ensure returned value is unique to the invididual.
 // FIXME: strip whitespace.
 string nickname_for_individual(Folks.Individual individual) {
 	if ( individual.nickname != "" ) {
