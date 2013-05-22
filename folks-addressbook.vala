@@ -31,6 +31,10 @@ int main(string[] args) {
 	aggregator.notify["is-quiescent"].connect(
 		(agg, evt) => {
 			foreach ( var individual in aggregator.individuals.values ) {
+				var primary_email = primary_address_for_individual(individual);
+				if ( primary_email == "" ) { continue; }
+
+				var sortname = sortname_for_individual(individual);
 				var nickname = nickname_for_individual(individual);
 
 				// FIXME: how to make this stable?
@@ -43,12 +47,15 @@ int main(string[] args) {
 				}
 				nicknames.add(nickname);
 
-				var sortname = sortname_for_individual(individual);
-				var address = primary_address_for_individual(individual);
-				if ( address == "" ) { continue; }
+				print_contact(nickname, sortname, primary_email);
 
-				// FIXME: add a separate row for each address found?
-				stdout.printf("%s\t%s\t<%s>\n", nickname, sortname, address);
+				int i = 1;
+				foreach ( var email in individual.email_addresses ) {
+					if ( email.value == primary_email ) { continue; }
+					print_contact(
+						"%s.%d".printf(nickname, i++), sortname, email.value
+					);
+				}
 			}
 
 			Gtk.main_quit();
@@ -58,6 +65,10 @@ int main(string[] args) {
 	aggregator.prepare.begin();
 	Gtk.main();
 	return 0;
+}
+
+void print_contact(string nickname, string sortname, string email) {
+	stdout.printf("%s\t%s\t<%s>\n", nickname, sortname, email);
 }
 
 // FIXME: strip whitespace.
