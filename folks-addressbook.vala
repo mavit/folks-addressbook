@@ -48,14 +48,19 @@ int main(string[] args) {
 				nicknames.add(nickname);
 
 				// Output the primary email address:
-				print_contact(nickname, sortname, primary_email);
+				print_contact(
+					nickname, sortname, individual.full_name, primary_email
+				);
 
 				// ...and any additional addresses:
 				int i = 1;
 				foreach ( var email in individual.email_addresses ) {
 					if ( email == primary_email ) { continue; }
 					print_contact(
-						"%s.%d".printf(nickname, i++), sortname, email
+						"%s.%d".printf(nickname, i++),
+						sortname, 
+						individual.full_name,
+						email
 					);
 				}
 			}
@@ -69,17 +74,33 @@ int main(string[] args) {
 	return 0;
 }
 
-void print_contact(string nickname, string sortname, EmailFieldDetails email) {
-	string types = "";
-	foreach ( string type in email.parameters.get("type") ) {
-		types += type;
-	}
-	stdout.printf( "%s\t%s\t<%s>\t\t%s\n",
-				   nickname, sortname, email.value, types );
+void print_contact(
+	string nickname, string sortname, string fullname, EmailFieldDetails email
+) {
+	var delimiters = new Regex("[\t\n]");
+	string types = delimiters.replace(
+		string.joinv(
+			" ", email.parameters.get("type").to_array()
+		), -1, 0, ""
+	);
+
+	stdout.printf(
+		"%s\t%s\t%s <%s>\t\t%s\n",
+		nickname, 
+		delimiters.replace(sortname, -1, 0, ""),
+		// FIXME: escape these properly:
+		delimiters.replace(fullname, -1, 0, ""),
+		delimiters.replace(email.value, -1, 0, ""),
+		types
+	);
 }
 
-// FIXME: strip whitespace.
 string nickname_for_individual(Folks.Individual individual) {
+	var whitespace = new Regex("\\s");
+    return whitespace.replace(nickname_for_individual_1(individual), -1, 0, "");
+}
+
+string nickname_for_individual_1(Folks.Individual individual) {
 	if ( individual.nickname != "" ) {
 		return individual.nickname;
 	}
