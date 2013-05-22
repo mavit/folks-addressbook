@@ -32,7 +32,7 @@ int main(string[] args) {
 		(agg, evt) => {
 			foreach ( var individual in aggregator.individuals.values ) {
 				var primary_email = primary_address_for_individual(individual);
-				if ( primary_email == "" ) { continue; }
+				if ( primary_email == null ) { continue; }
 
 				var sortname = sortname_for_individual(individual);
 				var nickname = nickname_for_individual(individual);
@@ -47,13 +47,15 @@ int main(string[] args) {
 				}
 				nicknames.add(nickname);
 
+				// Output the primary email address:
 				print_contact(nickname, sortname, primary_email);
 
+				// ...and any additional addresses:
 				int i = 1;
 				foreach ( var email in individual.email_addresses ) {
-					if ( email.value == primary_email ) { continue; }
+					if ( email == primary_email ) { continue; }
 					print_contact(
-						"%s.%d".printf(nickname, i++), sortname, email.value
+						"%s.%d".printf(nickname, i++), sortname, email
 					);
 				}
 			}
@@ -67,8 +69,13 @@ int main(string[] args) {
 	return 0;
 }
 
-void print_contact(string nickname, string sortname, string email) {
-	stdout.printf("%s\t%s\t<%s>\n", nickname, sortname, email);
+void print_contact(string nickname, string sortname, EmailFieldDetails email) {
+	string types = "";
+	foreach ( string type in email.parameters.get("type") ) {
+		types += type;
+	}
+	stdout.printf( "%s\t%s\t<%s>\t\t%s\n",
+				   nickname, sortname, email.value, types );
 }
 
 // FIXME: strip whitespace.
@@ -117,16 +124,17 @@ string sortname_for_individual(Folks.Individual individual) {
 	return "";
 }
 
-string primary_address_for_individual(Folks.Individual individual) {
+EmailFieldDetails primary_address_for_individual(Folks.Individual individual) {
 	foreach ( var address in individual.email_addresses ) {
-		foreach ( var value in address.parameters.get("x-evolution-ui-slot") ) {
+		foreach ( string value 
+				  in address.parameters.get("x-evolution-ui-slot") ) {
 			if ( value == "1" ) {
-				return address.value;
+				return address;
 			}
 		}
 	}
 	foreach ( var address in individual.email_addresses ) {
-		return address.value;
+		return address;
 	}
-	return "";
+	return null;
 }
