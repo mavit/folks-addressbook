@@ -34,8 +34,8 @@ int main(string[] args) {
 				var primary_email = primary_address_for_individual(individual);
 				if ( primary_email == null ) { continue; }
 
-				var sortname = sortname_for_individual(individual);
-				var nickname = nickname_for_individual(individual);
+				string sortname = sortname_for_individual(individual);
+				string nickname = individual.nickname;
 
 				// FIXME: how to make this stable?
 				if ( nickname != "" && nicknames.contains(nickname) ) {
@@ -57,7 +57,7 @@ int main(string[] args) {
 				foreach ( var email in individual.email_addresses ) {
 					if ( email == primary_email ) { continue; }
 					print_contact(
-						"%s.%d".printf(nickname, i++),
+						(nickname == "" ? "" : "%s.%d".printf(nickname, i++)),
 						sortname, 
 						individual.full_name,
 						email
@@ -78,42 +78,19 @@ void print_contact(
 	string nickname, string sortname, string fullname, EmailFieldDetails email
 ) {
 	var delimiters = new Regex("[\t\n]");
+	var whitespace = new Regex("\\s");
+
 	string types = string.joinv(" ", email.parameters.get("type").to_array());
 
 	stdout.printf(
 		"%s\t%s\t%s <%s>\t\t%s\n",
-		nickname, 
+		whitespace.replace(nickname, -1, 0, ""),
 		delimiters.replace(sortname, -1, 0, ""),
 		// FIXME: escape these properly:
 		delimiters.replace(fullname, -1, 0, ""),
 		delimiters.replace(email.value, -1, 0, ""),
 		delimiters.replace(types, -1, 0, "")
 	);
-}
-
-string nickname_for_individual(Folks.Individual individual) {
-	var whitespace = new Regex("\\s");
-    return whitespace.replace(nickname_for_individual_1(individual), -1, 0, "");
-}
-
-string nickname_for_individual_1(Folks.Individual individual) {
-	if ( individual.nickname != "" ) {
-		return individual.nickname;
-	}
-	else if ( individual.structured_name == null ) {
-		return "";
-	}
-
-	string nickname = ""; 
-	// FIXME: what is the Vala syntax to make this a loop?
-	if ( individual.structured_name.given_name != null ) {
-		nickname += individual.structured_name.given_name;
-	}
-	if ( individual.structured_name.family_name != null ) {
-		nickname += individual.structured_name.family_name;
-	}
-
-	return nickname;
 }
 
 string sortname_for_individual(Folks.Individual individual) {
