@@ -78,11 +78,7 @@ void print_contact(
 	string nickname, string sortname, string fullname, EmailFieldDetails email
 ) {
 	var delimiters = new Regex("[\t\n]");
-	string types = delimiters.replace(
-		string.joinv(
-			" ", email.parameters.get("type").to_array()
-		), -1, 0, ""
-	);
+	string types = string.joinv(" ", email.parameters.get("type").to_array());
 
 	stdout.printf(
 		"%s\t%s\t%s <%s>\t\t%s\n",
@@ -91,7 +87,7 @@ void print_contact(
 		// FIXME: escape these properly:
 		delimiters.replace(fullname, -1, 0, ""),
 		delimiters.replace(email.value, -1, 0, ""),
-		types
+		delimiters.replace(types, -1, 0, "")
 	);
 }
 
