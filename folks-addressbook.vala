@@ -1,4 +1,4 @@
-#!/usr/bin/vala --pkg gtk+-3.0 --pkg folks
+#!/usr/bin/vala -X -w --pkg gtk+-3.0 --pkg folks
 
 //     Copyright 2013 Peter Oliver.
 //
