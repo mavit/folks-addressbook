@@ -30,6 +30,8 @@ int main(string[] args) {
 	
 	aggregator.notify["is-quiescent"].connect(
 		(agg, evt) => {
+			var people = new Gee.LinkedList<Person> ();
+
 			foreach ( var individual in aggregator.individuals.values ) {
 				var primary_email = primary_address_for_individual(individual);
 				if ( primary_email == null ) { continue; }
@@ -47,19 +49,34 @@ int main(string[] args) {
 				}
 				nicknames.add(nickname);
 
+				people.add(
+					new Person(nickname, sortname, primary_email, individual)
+				);
+
+			}
+
+			CompareFunc<Person> compare_individuals = (a, b) => {
+				return strcmp(a.sortname, b.sortname);
+			};
+			people.sort(compare_individuals);
+			foreach ( var person in people ) {
 				// Output the primary email address:
 				print_contact(
-					nickname, sortname, individual.full_name, primary_email
+					person.nickname,
+					person.sortname,
+					person.individual.full_name,
+					person.primary_email
 				);
 
 				// ...and any additional addresses:
 				int i = 1;
-				foreach ( var email in individual.email_addresses ) {
-					if ( email == primary_email ) { continue; }
+				foreach ( var email in person.individual.email_addresses ) {
+					if ( email == person.primary_email ) { continue; }
 					print_contact(
-						(nickname == "" ? "" : "%s.%d".printf(nickname, i++)),
-						sortname, 
-						individual.full_name,
+						( person.nickname == "" 
+						  ? "" : "%s.%d".printf(person.nickname, i++) ),
+						person.sortname, 
+						person.individual.full_name,
 						email
 					);
 				}
@@ -131,4 +148,23 @@ EmailFieldDetails primary_address_for_individual(Folks.Individual individual) {
 		return address;
 	}
 	return null;
+}
+
+class Person {
+	public string nickname;
+	public string sortname;
+	public EmailFieldDetails primary_email;
+	public Individual individual;
+
+	public Person(
+		string nickname,
+		string sortname,
+		EmailFieldDetails primary_email,
+		Individual individual
+	) {
+		this.nickname = nickname;
+		this.sortname = sortname;
+		this.primary_email = primary_email;
+		this.individual = individual;
+	}
 }
