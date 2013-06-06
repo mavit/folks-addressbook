@@ -65,7 +65,6 @@ int main(string[] args) {
 				print_contact(
 					person.nickname,
 					person.sortname,
-					person.individual.full_name,
 					person.primary_email
 				);
 
@@ -77,7 +76,6 @@ int main(string[] args) {
 						( person.nickname == "" 
 						  ? "" : "%s.%d".printf(person.nickname, i++) ),
 						person.sortname, 
-						person.individual.full_name,
 						email
 					);
 				}
@@ -93,7 +91,7 @@ int main(string[] args) {
 }
 
 void print_contact(
-	string nickname, string sortname, string fullname, EmailFieldDetails email
+	string nickname, string sortname, EmailFieldDetails email
 ) {
 	var delimiters = new Regex("[\t\n]");
 	var whitespace = new Regex("\\s");
@@ -101,11 +99,10 @@ void print_contact(
 	string types = string.joinv(" ", email.parameters.get("type").to_array());
 
 	stdout.printf(
-		"%s\t%s\t%s <%s>\t\t%s\n",
+		"%s\t%s\t%s\t\t%s\n",
 		whitespace.replace(nickname, -1, 0, ""),
 		delimiters.replace(sortname, -1, 0, ""),
 		// FIXME: escape these properly:
-		delimiters.replace(fullname, -1, 0, ""),
 		delimiters.replace(email.value, -1, 0, ""),
 		delimiters.replace(types, -1, 0, "")
 	);
