@@ -37,8 +37,9 @@ int main(string[] args) {
 				if ( primary_email == null ) { continue; }
 
 				string sortname = sortname_for_individual(individual);
-				string nickname = individual.nickname;
-
+				string nickname = ( individual.alias != ""
+									? individual.alias : individual.nickname );
+				
 				// FIXME: how to make this stable?
 				if ( nickname != "" && nicknames.contains(nickname) ) {
 					int i = 2;
