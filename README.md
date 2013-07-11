@@ -21,3 +21,9 @@ To pull in the required dependencies on Fedora, run:
 ```bash
 sudo yum install folks-devel
 ```
+
+To pull in the required dependencies on Ubuntu, run:
+
+```bash
+sudo apt-get install valac libfolks-dev libtelepathy-glib-dev libgtk-3-dev
+```
