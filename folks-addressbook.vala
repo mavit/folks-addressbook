@@ -1,4 +1,4 @@
-#!/usr/bin/vala -X -w --pkg gtk+-3.0 --pkg folks
+#!/usr/bin/vala -X -w --pkg gtk+-3.0 --pkg folks --pkg gee-0.8
 
 //     Copyright 2013 Peter Oliver.
 //
@@ -56,7 +56,7 @@ int main(string[] args) {
 
 			}
 
-			CompareFunc<Person> compare_individuals = (a, b) => {
+			CompareDataFunc<Person> compare_individuals = (a, b) => {
 				return strcmp(a.sortname, b.sortname);
 			};
 			people.sort(compare_individuals);
